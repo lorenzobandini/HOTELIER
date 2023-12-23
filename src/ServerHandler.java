@@ -17,14 +17,18 @@ public class ServerHandler implements Runnable {
     public void run() {
         System.out.println("Siamo nell'handler " + clientSocket.getRemoteSocketAddress());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
+                String clientMessage;
 
-                // Leggi il messaggio dal client
-                String clientMessage = reader.readLine();
-                System.out.println("Messaggio ricevuto dal client: " + clientMessage);
+                while((clientMessage = reader.readLine()) != null){
+                    System.out.println("Messaggio ricevuto dal client: " + clientMessage);
 
-                // Invia una risposta al client
-                writer.println("Messaggio ricevuto correttamente!");
+                    writer.println(clientMessage);
+                    if(clientMessage.equals("exit")){
+                        break;
+                    }
+                }
+                
 
             } catch (IOException e) {
                 e.printStackTrace();

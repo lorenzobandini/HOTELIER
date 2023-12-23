@@ -13,8 +13,14 @@ public class ClientListener implements Runnable {
     public void run() {
         System.out.println("Siamo nel listener di: " + clientSocket.getRemoteSocketAddress());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))){
-            String clientMessage = reader.readLine();
-            System.out.println("Messaggio ricevuto dal client: " + clientMessage);
+            String serverMessage;
+            while((serverMessage = reader.readLine()) != null){
+                System.out.println("Messaggio ricevuto dal server: " + serverMessage);
+                if(serverMessage.equals("exit")){
+                    break;
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();    
         }
