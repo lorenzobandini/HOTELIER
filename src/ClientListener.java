@@ -11,15 +11,20 @@ public class ClientListener implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Siamo nel listener di: " + clientSocket.getRemoteSocketAddress());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))){
             String serverMessage;
-            while((serverMessage = reader.readLine()) != null){
-                System.out.println("Messaggio ricevuto dal server: " + serverMessage);
+
+            serverMessage = reader.readLine();
+
+            do{
+                System.out.println("> "+ serverMessage);
                 if(serverMessage.equals("exit")){
                     break;
                 }
-            }
+            }while((serverMessage = reader.readLine()) != null);
+
+            reader.close();
+            clientSocket.close();
 
         } catch (Exception e) {
             e.printStackTrace();    

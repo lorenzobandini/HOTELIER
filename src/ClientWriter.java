@@ -12,21 +12,21 @@ public class ClientWriter implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Siamo nel writer di: " + clientSocket.getRemoteSocketAddress());
-
         try(PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)){
             Scanner scanner = new Scanner(System.in);
             String message;
+            
             while((message = scanner.nextLine()) != null){
                 writer.println(message);
                 if(message.equals("exit"))
                     break;
             }
-            scanner.close();
 
+            scanner.close();
+            writer.close();
+            clientSocket.close();
         } catch (Exception e) {
             e.printStackTrace();    
         }
-
     }
 }
