@@ -18,7 +18,6 @@ public class ServerHandler implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Siamo nell'handler " + clientSocket.getRemoteSocketAddress());
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
                 
@@ -133,6 +132,7 @@ public class ServerHandler implements Runnable {
                 reader.close();
                 writer.close();
                 clientSocket.close();
+                System.out.println("Client " + clientSocket.getRemoteSocketAddress() + " disconnected");
 
             } catch (IOException e) {
                 e.printStackTrace();

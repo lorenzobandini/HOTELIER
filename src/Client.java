@@ -13,7 +13,7 @@ public class Client {
 
             listener.join();
             writer.join();
-            System.out.println("sono qui");
+            
             clientSocket.close();
 
         } catch (Exception e) {

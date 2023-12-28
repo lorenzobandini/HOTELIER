@@ -16,13 +16,18 @@ public class ClientListener implements Runnable {
 
             serverMessage = reader.readLine();
 
-            do{
-                System.out.println("> "+ serverMessage);
-                if(serverMessage.equals("exit")){
+            while ((serverMessage = reader.readLine()) != null) {
+                System.out.println("> " + serverMessage);
+                if (serverMessage.equals("exit")) {
                     break;
                 }
-            }while((serverMessage = reader.readLine()) != null);
-
+                
+                if (clientSocket.isClosed()) {
+                    // Esci dal loop se il socket è chiuso
+                    break;
+                }
+            }
+            
             reader.close();
             clientSocket.close();
 
