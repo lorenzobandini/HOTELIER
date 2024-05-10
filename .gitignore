@@ -1,0 +1,33 @@
+# Ignora i file di sistema
+.DS_Store
+Thumbs.db
+
+# Ignora i file temporanei, i file di backup ecc
+*~
+*.swp
+*.tmp
+*.temp
+*.bak
+*.sav
+*.log
+
+# Ignora i file di sviluppo
+/target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+
+# Ignora i file di configurazione dell'IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignora i file specifici di Maven
+log/
+target/
