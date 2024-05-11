@@ -26,6 +26,7 @@ public class ClientWriter implements Runnable{
         while (!(message = scanner.nextLine()).equals("exit")) {
             out.println(message);
         }
+        out.println("exit");
         out.close();
         scanner.close();
         try {
