@@ -117,6 +117,10 @@ public class HotelierClientHandler implements Runnable {
                             hotelName = reader.readLine();
                             writer.println(yellow +"Insert the city of the hotel you want to review:" + reset);
                             city = reader.readLine();
+                            if(checkHotel(hotelName, city)){
+                                writer.println(red +"Hotel not found!" + reset);
+                                break;
+                            }
                             writer.println(yellow +"Insert the global score of the hotel you want to review from 1 to 5:" + reset);
                             int globalScore = Integer.parseInt(reader.readLine());
                             writer.println(yellow +"Now you have to insert the scores of the hotel from 1 to 5" + reset);
@@ -354,6 +358,19 @@ public class HotelierClientHandler implements Runnable {
         Map<String, Integer> ratings = hotel.getRatings();
         for (Map.Entry<String, Integer> entry : ratings.entrySet()) {
             writer.println(blue + "    " + entry.getKey() + ": " + entry.getValue() + reset);
+        }
+    }
+
+    private boolean checkHotel(String hotelName, String city) throws IOException {
+        synchronized (lockHotels) {
+            List<Hotel> hotels = getListHotels();
+
+            for (Hotel hotel : hotels) {
+                if (hotel.getName().equals(hotelName) && hotel.getCity().equals(city)) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
