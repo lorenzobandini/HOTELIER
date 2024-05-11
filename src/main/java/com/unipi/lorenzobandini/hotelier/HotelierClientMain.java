@@ -29,6 +29,7 @@ public class HotelierClientMain {
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     executor.submit(new HotelierClientHandler(clientSocket));
+                    System.out.println("Client connected at port " + clientSocket.getPort());
                 }
             } finally {
                 serverSocket.close();
