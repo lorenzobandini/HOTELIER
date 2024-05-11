@@ -17,29 +17,28 @@ import java.lang.reflect.Type;
 import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 
 public class HotelierClientHandler implements Runnable {
 
     private Socket clientSocket;
+    private Gson gson;
 
-    private String username;
+    private String currentUsername;
     private boolean isLogged = false;
     
-    public HotelierClientHandler(Socket clientSocket){
+    public HotelierClientHandler(Socket clientSocket, Gson gson){
         this.clientSocket = clientSocket;
+        this.gson = gson;
     }
 
     @Override
     public void run() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
-                
-                String password, hotelName, city;
-                
-                String clientMessage;
+
+                String username, password, hotelName, city, clientMessage;
 
                 writer.println(homeMessage());
 
@@ -51,7 +50,7 @@ public class HotelierClientHandler implements Runnable {
                                 break;
                             }
                             writer.println("Insert username for registration:");
-                            this.username = reader.readLine();
+                            username = reader.readLine();
                             writer.println("Insert password for registration:");
                             password = reader.readLine();
                             register(username, password, writer);
@@ -63,10 +62,10 @@ public class HotelierClientHandler implements Runnable {
                                 break;
                             }
                             writer.println("Insert username for login:");
-                            this.username = reader.readLine();
+                            username = reader.readLine();
                             writer.println("Insert password for login:");
                             password = reader.readLine();
-                            login(this.username, password);
+                            login(username, password, writer);
                             break;
 
                         case "3": //logout
@@ -74,7 +73,8 @@ public class HotelierClientHandler implements Runnable {
                                 writer.println("You have to login to logout");
                                 break;
                             }
-                            logout(this.username);
+                            logout(this.currentUsername, writer);
+                            this.currentUsername = null;
                             break;
 
                         case "4": //searchHotel
@@ -104,7 +104,7 @@ public class HotelierClientHandler implements Runnable {
                             int globalScore = Integer.parseInt(reader.readLine());
                             writer.println("Now you have to insert the scores of the hotel from 1 to 5");
                             
-                            int[] scores = new int[5];
+                            int[] scores = new int[4];
                             writer.println("Insert the score of the cleaning of the hotel from 1 to 5");
                             scores[0] = Integer.parseInt(reader.readLine());
                             writer.println("Insert the score of the position of the hotel from 1 to 5");
@@ -119,16 +119,18 @@ public class HotelierClientHandler implements Runnable {
 
                         case "7":   //showMyBadges
                             if(!this.isLogged){
-                                writer.println("You have to login to see your badges");
+                                writer.println("You have to login to see your badge");
                                 break;
                             }
-                            showMyBadges();
+                            showMyBadge(writer);
                             break;
 
                         case "8":   //exit
                             writer.println("Type exit to confirm the exit");
                             if(reader.readLine().equals("exit")){
-                                writer.println("Thank you for using our Hotel Booking System HOTELIER! Bye bye!");
+                                if(this.isLogged){
+                                    logout(this.currentUsername, writer);
+                                }
                                 clientMessage = "exit";
                                 break;
                             }
@@ -159,60 +161,84 @@ public class HotelierClientHandler implements Runnable {
 
     private String homeMessage(){
         if(this.isLogged){
-            return "Welcome to the Hotel Booking System HOTELIER!\nThe commands are:\n[1] register <username> <password>\n[2] login <username> <password>\n[3] logout <username>\n[4] search a hotel <hotelName> <city>\n[5] search all the hotels in a city <city>\n[6] insert a review for a hotel <hotelName> <city> <globalScore> <scores>\n[7] show my badge\n[8] exit";
+            return (this.currentUsername + ", welcome to the Hotel Booking System HOTELIER!\nThe commands are:\n[1] register <username> <password>\n[2] login <username> <password>\n[3] logout <username>\n[4] search a hotel <hotelName> <city>\n[5] search all the hotels in a city <city>\n[6] insert a review for a hotel <hotelName> <city> <globalScore> <scores>\n[7] show my badge\n[8] exit");
         }else{
             return "Welcome to the Hotel Booking System HOTELIER!\nThe commands that you can do are (for some of these you will have to login):\n[1] register <username> <password>\n[2] login <username> <password>\n[3] logout <username> (login required)\n[4] search a hotel <hotelName> <city>\n[5] search all the hotels in a city <city>\n[6] insert a review for a hotel <hotelName> <city> <globalScore> <scores> (login required)\n[7] show my badge (login required)\n[8] exit";
         }
 
     }
 
-    private void register (String username, String password, PrintWriter writer) throws NoSuchAlgorithmException, IOException{
+    private synchronized void register (String username, String password, PrintWriter writer) throws NoSuchAlgorithmException, IOException{
 
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(password.getBytes());
-        byte[] digest = md.digest();
-        String hash = DatatypeConverter.printHexBinary(digest).toLowerCase();
+        User user = new User(username, hashPassword(password), false, "Recensore", 0);
 
-        User user = new User(username, hash, false, "Recensore", 0);
+        List<User> users = getListUsers();
+        File file = new File("src/main/resources/Users.json");
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        synchronized (this) {
-            // Leggi il file esistente
-            File file = new File("src/main/resources/Users.json");
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            Type userListType = new TypeToken<ArrayList<User>>(){}.getType();
-
-            // Se il file non è vuoto, deserializza il contenuto in una lista di utenti
-            List<User> users = new ArrayList<>();
-            if (file.length() != 0) {
-                users = gson.fromJson(br, userListType);
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equals(username)) {
+                writer.println("Username already exists! Chose another one!");
+                return;
             }
+        }
 
-            for (User existingUser : users) {
-                if (existingUser.getUsername().equals(username)) {
-                    writer.println("Username already exists");
+        // Aggiungi il nuovo utente alla lista
+        users.add(user);
+
+        // Riscrivi il file con la lista aggiornata
+        FileWriter fileWriter = new FileWriter(file);
+        this.gson.toJson(users, fileWriter);
+        fileWriter.flush();
+        fileWriter.close();
+        writer.println("User registered successfully!");
+    }
+
+    private synchronized void login (String username, String password, PrintWriter writer) throws NoSuchAlgorithmException, IOException {
+        
+        File file = new File("src/main/resources/Users.json");
+        List<User> users = getListUsers();
+
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equals(username)) {
+                if (existingUser.getHashPassword().equals(hashPassword(password))) {
+                    existingUser.setLogged(true);
+                    FileWriter fileWriter = new FileWriter(file);
+                    gson.toJson(users, fileWriter);
+                    fileWriter.flush();
+                    fileWriter.close();
+                    this.isLogged = true;
+                    this.currentUsername = username;
+                    writer.println("Login successful");
+                    return;
+                } else {
+                    writer.println("Incorrect password");
                     return;
                 }
             }
-
-            // Aggiungi il nuovo utente alla lista
-            users.add(user);
-
-            // Riscrivi il file con la lista aggiornata
-            FileWriter fileWriter = new FileWriter(file);
-            gson.toJson(users, fileWriter);
-            fileWriter.flush();
-            fileWriter.close();
         }
+
+        writer.println("Username not found");
     }
 
-    private void login (String username, String password) {
+    private synchronized void logout (String username, PrintWriter writer) throws IOException {    
 
-    }
-
-    private void logout (String username) {
-
+        File file = new File("src/main/resources/Users.json");
+        List<User> users = getListUsers();
+    
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equals(username)) {
+                // Imposta isLogged a false e aggiorna il file JSON
+                existingUser.setLogged(false);
+                FileWriter fileWriter = new FileWriter(file);
+                this.gson.toJson(users, fileWriter);
+                fileWriter.flush();
+                fileWriter.close();
+                this.isLogged = false;
+                this.currentUsername = null;
+                writer.println("Logout successful");
+                return;
+            }
+        }
     }
 
     private void searchHotel(String hotelName, String city) {
@@ -227,9 +253,37 @@ public class HotelierClientHandler implements Runnable {
         
     }
 
-    private void showMyBadges() {
-        
+    private void showMyBadge(PrintWriter writer) throws IOException {
+    
+        List<User> users = getListUsers();
+    
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equals(this.currentUsername)) {
+                writer.println("Your badge is: " + existingUser.getBadge());
+                return;
+            }
+        }
     }
+
+    private List<User> getListUsers() throws IOException {
+
+        File file = new File("src/main/resources/Users.json");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        Type userListType = new TypeToken<ArrayList<User>>(){}.getType();
+        List<User> users = new ArrayList<>();
+        if (file.length() != 0) {
+            users = this.gson.fromJson(br, userListType);
+        }
+        return users;
+    }
+
+    private String hashPassword(String password) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        return DatatypeConverter.printHexBinary(digest).toLowerCase();
+    }
+
 }
 
 class User{
