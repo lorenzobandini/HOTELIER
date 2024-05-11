@@ -8,6 +8,10 @@ import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.ExecutorService;
 
 
@@ -24,11 +28,13 @@ public class HotelierClientMain {
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()));
             ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
             System.out.println("Server started at address "+ properties.getAddress() +" and port " + properties.getPortNumber());
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             
             try {
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    executor.submit(new HotelierClientHandler(clientSocket));
+                    executor.submit(new HotelierClientHandler(clientSocket, gson));
                     System.out.println("Client connected at port " + clientSocket.getPort());
                 }
             } finally {
