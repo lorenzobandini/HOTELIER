@@ -276,6 +276,7 @@ public class HotelierClientHandler implements Runnable {
             for (Hotel hotel : hotels) {
                 if (hotel.getName().equals(hotelName) && hotel.getCity().equals(city)) {
                     printHotelStat(hotel, writer);
+                    writer.println(yellow +"---------------------------------------------" + reset);
                     return;
                 }
             }
@@ -292,6 +293,7 @@ public class HotelierClientHandler implements Runnable {
                     printHotelStat(hotel, writer);
                 }
             }
+        writer.println(yellow +"---------------------------------------------" + reset);
         }
         
     }
@@ -306,7 +308,7 @@ public class HotelierClientHandler implements Runnable {
         
             for (User existingUser : users) {
                 if (existingUser.getUsername().equals(this.currentUsername)) {
-                    writer.println(green+"Your badge is: " + existingUser.getBadge()+reset);
+                    writer.println(blue+"Your badge is: " + existingUser.getBadge()+reset);
                     return;
                 }
             }
