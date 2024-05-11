@@ -1,10 +1,24 @@
 package com.unipi.lorenzobandini.hotelier;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.reflect.Type;
+
+import javax.xml.bind.DatatypeConverter;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 
 public class HotelierClientHandler implements Runnable {
@@ -40,7 +54,7 @@ public class HotelierClientHandler implements Runnable {
                             this.username = reader.readLine();
                             writer.println("Insert password for registration:");
                             password = reader.readLine();
-                            register(username, password);
+                            register(username, password, writer);
                             break;
 
                         case "2": //login
@@ -138,6 +152,8 @@ public class HotelierClientHandler implements Runnable {
 
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
             }
     }
 
@@ -150,8 +166,45 @@ public class HotelierClientHandler implements Runnable {
 
     }
 
-    private void register (String username, String password) {
+    private void register (String username, String password, PrintWriter writer) throws NoSuchAlgorithmException, IOException{
 
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String hash = DatatypeConverter.printHexBinary(digest).toLowerCase();
+
+        User user = new User(username, hash, false, "Recensore", 0);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        synchronized (this) {
+            // Leggi il file esistente
+            File file = new File("src/main/resources/Users.json");
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            Type userListType = new TypeToken<ArrayList<User>>(){}.getType();
+
+            // Se il file non è vuoto, deserializza il contenuto in una lista di utenti
+            List<User> users = new ArrayList<>();
+            if (file.length() != 0) {
+                users = gson.fromJson(br, userListType);
+            }
+
+            for (User existingUser : users) {
+                if (existingUser.getUsername().equals(username)) {
+                    writer.println("Username already exists");
+                    return;
+                }
+            }
+
+            // Aggiungi il nuovo utente alla lista
+            users.add(user);
+
+            // Riscrivi il file con la lista aggiornata
+            FileWriter fileWriter = new FileWriter(file);
+            gson.toJson(users, fileWriter);
+            fileWriter.flush();
+            fileWriter.close();
+        }
     }
 
     private void login (String username, String password) {
@@ -176,5 +229,53 @@ public class HotelierClientHandler implements Runnable {
 
     private void showMyBadges() {
         
+    }
+}
+
+class User{
+    private String username;
+    private String hashPassword;
+    private boolean isLogged;
+    private String badge;
+    private int reviewCount;
+
+    public User(String username, String hashPassword, boolean isLogged, String badge, int reviewCount){
+        this.username = username;
+        this.hashPassword = hashPassword;
+        this.isLogged = isLogged;
+        this.badge = badge;
+        this.reviewCount = reviewCount;
+    }
+
+    public String getUsername(){
+        return this.username;
+    }
+
+    public String getHashPassword(){
+        return this.hashPassword;
+    }
+
+    public boolean isLogged(){
+        return this.isLogged;
+    }
+
+    public void setLogged(boolean isLogged){
+        this.isLogged = isLogged;
+    }
+
+    public String getBadge(){
+        return this.badge;
+    }
+
+    public void setBadge(String badge){
+        this.badge = badge;
+    }
+
+    public int getReviewCount(){
+        return this.reviewCount;
+    }
+
+    public void addReview(){
+        this.reviewCount++;
     }
 }
