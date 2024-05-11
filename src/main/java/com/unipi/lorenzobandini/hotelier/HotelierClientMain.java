@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 public class HotelierClientMain {
  
     public static void main(String[] args) {
-        GroupProperties properties = getPropertiesClient();
+        GroupProperties properties = getPropertiesServer();
         
         int minPoolSize = properties.getMinPoolSize();
         int maxPoolSize = properties.getMaxPoolSize();
@@ -39,7 +39,7 @@ public class HotelierClientMain {
         
     }
 
-    private static GroupProperties getPropertiesClient() {
+    private static GroupProperties getPropertiesServer() {
         Properties properties = getProperties();
         
         String socket = properties.getProperty("socket");
