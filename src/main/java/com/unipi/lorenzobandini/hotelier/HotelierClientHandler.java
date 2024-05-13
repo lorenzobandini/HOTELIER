@@ -37,6 +37,7 @@ public class HotelierClientHandler implements Runnable {
 
     private final Object lockUsers = new Object();
     private final Object lockHotels = new Object();
+    private final Object lockReviews = new Object();
 
     public HotelierClientHandler(Socket clientSocket, Gson gson){
         this.clientSocket = clientSocket;
@@ -95,10 +96,10 @@ public class HotelierClientHandler implements Runnable {
                             break;
 
                         case "4": //searchHotel
-                            writer.println(yellow +"Insert the hotel name of the hotel you want to search:"+ reset);
-                            hotelName = reader.readLine();
                             writer.println(yellow +"Insert the city of the hotel you want to search:" + reset);
                             city = reader.readLine();
+                            writer.println(yellow +"Insert the hotel name of the hotel you want to search:"+ reset);
+                            hotelName = reader.readLine();
                             searchHotel(hotelName, city, writer);
                             break;
 
@@ -113,29 +114,24 @@ public class HotelierClientHandler implements Runnable {
                                 writer.println(red + "You have to login to insert a review"+ reset);
                                 break;
                             }
-                            writer.println(yellow +"Insert the hotel name of the hotel you want to review:" + reset);
-                            hotelName = reader.readLine();
                             writer.println(yellow +"Insert the city of the hotel you want to review:" + reset);
                             city = reader.readLine();
+                            writer.println(yellow +"Insert the hotel name of the hotel you want to review:" + reset);
+                            hotelName = reader.readLine();
                             if(checkHotel(hotelName, city)){
                                 writer.println(red +"Hotel not found!" + reset);
                                 break;
                             }
-                            writer.println(yellow +"Insert the global score of the hotel you want to review from 1 to 5:" + reset);
-                            int globalScore = Integer.parseInt(reader.readLine());
-                            writer.println(yellow +"Now you have to insert the scores of the hotel from 1 to 5" + reset);
-                            
+
+                            int globalScore = getScore("global ", writer, reader);
+
                             int[] scores = new int[4];
-                            writer.println(yellow +"Insert the score of the cleaning of the hotel from 1 to 5" + reset);
-                            scores[0] = Integer.parseInt(reader.readLine());
-                            writer.println(yellow +"Insert the score of the position of the hotel from 1 to 5" + reset);
-                            scores[1] = Integer.parseInt(reader.readLine());
-                            writer.println(yellow +"Insert the score of the services of the hotel from 1 to 5" + reset);
-                            scores[2] = Integer.parseInt(reader.readLine());
-                            writer.println(yellow +"Insert the score of the quality of the hotel from 1 to 5" + reset);
-                            scores[3] = Integer.parseInt(reader.readLine());
-                            
-                            insertReview(hotelName, city, globalScore, scores);
+                            scores[0] = getScore("cleaning ", writer, reader);
+                            scores[1] = getScore("position ", writer, reader);
+                            scores[2] = getScore("services ", writer, reader);
+                            scores[3] = getScore("quality ", writer, reader);
+
+                            insertReview(hotelName, city, globalScore, scores, writer);
                             break;
 
                         case "7":   //showMyBadges
@@ -182,9 +178,9 @@ public class HotelierClientHandler implements Runnable {
 
     private String homeMessage(){
         if(this.isLogged){
-            return (yellow+ this.currentUsername + ", welcome to the Hotel Booking System HOTELIER!\nThe commands are:\n[1] register <username> <password>\n[2] login <username> <password>\n[3] logout <username>\n[4] search a hotel <hotelName> <city>\n[5] search all the hotels in a city <city>\n[6] insert a review for a hotel <hotelName> <city> <globalScore> <scores>\n[7] show my badge\n[8] exit"+ reset);
+            return (yellow+ this.currentUsername + ", welcome to the Hotel Booking System HOTELIER!\nThe commands are:\n[1] Register\n[2] Login\n[3] Logout\n[4] Search a hotel\n[5] Search all the hotels in a city\n[6] Insert a review for a hotel\n[7] Show my badge\n[8] Exit"+ reset);
         }else{
-            return (yellow + "Welcome to the Hotel Booking System HOTELIER!\nThe commands that you can do are (for some of these you will have to login):\n[1] register <username> <password>\n[2] login <username> <password>\n[3] logout <username> (login required)\n[4] search a hotel <hotelName> <city>\n[5] search all the hotels in a city <city>\n[6] insert a review for a hotel <hotelName> <city> <globalScore> <scores> (login required)\n[7] show my badge (login required)\n[8] exit"+ reset);
+            return (yellow + "Welcome to the Hotel Booking System HOTELIER!\nThe commands that you can do are (for some of these you will have to login):\n[1] Register\n[2] Login\n[3] Logout (login required)\n[4] Search a hotel\n[5] Search all the hotels in a city\n[6] Insert a review for a hotel (login required)\n[7] Show my badge (login required)\n[8] Exit"+ reset);
         }
 
     }
@@ -302,8 +298,36 @@ public class HotelierClientHandler implements Runnable {
         
     }
 
-    private void insertReview(String hotelName, String city, int globalScore, int[] scores) {
-        
+    private void insertReview(String hotelName, String city, int globalScore, int[] scores, PrintWriter writer) throws IOException {
+        synchronized(lockReviews){
+            List <HotelReviews> allHotelsReviews = getListReviews();
+            Review review = new Review(this.currentUsername, globalScore, scores);
+
+            for(HotelReviews hotelReviews : allHotelsReviews){
+                if(hotelReviews.getHotelName().equals(hotelName) && hotelReviews.getCity().equals(city)){
+                    hotelReviews.addReview(review);
+                    FileWriter fileWriter = new FileWriter("src/main/resources/Reviews.json");
+                    this.gson.toJson(allHotelsReviews, fileWriter);
+                    fileWriter.flush();
+                    fileWriter.close();
+                    writer.println(green +"Review added successfully"+reset);
+                    return;
+                }
+            }
+            HotelReviews hotelReviews = new HotelReviews(hotelName, city);
+            hotelReviews.addReview(review);
+            allHotelsReviews.add(hotelReviews);
+            FileWriter fileWriter = new FileWriter("src/main/resources/Reviews.json");
+            try{
+                this.gson.toJson(allHotelsReviews, fileWriter);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            fileWriter.flush();
+            fileWriter.close();
+            writer.println(green +"Review added successfully"+reset);
+            
+        }
     }
 
     private void showMyBadge(PrintWriter writer) throws IOException {
@@ -343,6 +367,18 @@ public class HotelierClientHandler implements Runnable {
         return hotels;
     }
 
+    private List<HotelReviews> getListReviews() throws IOException {
+
+        File file = new File("src/main/resources/Reviews.json");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        Type reviewsListType = new TypeToken<ArrayList<HotelReviews>>(){}.getType();
+        List<HotelReviews> reviews = new ArrayList<>();
+        if (file.length() != 0) {
+            reviews = this.gson.fromJson(br, reviewsListType);
+        }
+        return reviews;
+    }
+
     private void printHotelStat(Hotel hotel, PrintWriter writer) {
         writer.println(yellow +"---------------------------------------------" + reset);
         writer.println(yellow +"Hotel found: " + blue + hotel.getName()+ reset);
@@ -372,6 +408,18 @@ public class HotelierClientHandler implements Runnable {
             }
             return true;
         }
+    }
+
+    private int getScore(String scoreType, PrintWriter writer, BufferedReader reader) throws IOException {
+        int score = 0;
+        while (score < 1 || score > 5) {
+            writer.println(yellow +"Insert the " + scoreType + "score of the hotel from 1 to 5" + reset);
+            score = Integer.parseInt(reader.readLine());
+            if (score < 1 || score > 5) {
+                writer.println(red +"Invalid score!"+reset);
+            }
+        }
+        return score;
     }
 
     private String hashPassword(String password) throws NoSuchAlgorithmException {
@@ -427,6 +475,19 @@ class User{
 
     public void addReview(){
         this.reviewCount++;
+        setBadge();
+    }
+
+    private void setBadge(){
+        if(this.reviewCount >= 5 && this.reviewCount < 10){
+            this.badge = "Recensore Esperto";
+        }else if(this.reviewCount >= 10 && this.reviewCount < 20){
+            this.badge = "Contributore";
+        }else if(this.reviewCount >= 20 && this.reviewCount < 30){
+            this.badge = "Contributore Esperto";
+        }else if(this.reviewCount >= 30){
+            this.badge = "Contributore Super";
+        }
     }
 }
 
@@ -514,6 +575,62 @@ class Hotel {
     public void setRatings(Map<String, Integer> ratings) {
         this.ratings = ratings;
     }
+}
 
-    // Getters e setters per ogni campo...
+class HotelReviews{
+    private String hotelName;
+    private String city;
+    private int numReviews = 0;
+    private List<Review> reviews = new ArrayList<>();
+
+    public HotelReviews(String hotelName, String city){
+        this.hotelName = hotelName;
+        this.city = city;
+    }
+
+    public String getHotelName(){
+        return this.hotelName;
+    }
+
+    public String getCity(){
+        return this.city;
+    }
+
+    public List<Review> getReviews(){
+        return this.reviews;
+    }
+
+    public int getNumReviews(){
+        return this.numReviews;
+    }
+
+    public void addReview(Review review){
+        this.reviews.add(review);
+        this.numReviews++;
+    }
+    
+}
+
+class Review{
+    private String reviewer;
+    private int globalScore;
+    private int[] scores;
+
+    public Review(String reviewer, int globalScore, int[] scores){
+        this.reviewer = reviewer;
+        this.globalScore = globalScore;
+        this.scores = scores;
+    }
+
+    public String getReviewer(){
+        return this.reviewer;
+    }
+
+    public int getGlobalScore(){
+        return this.globalScore;
+    }
+
+    public int[] getScores(){
+        return this.scores;
+    }
 }
