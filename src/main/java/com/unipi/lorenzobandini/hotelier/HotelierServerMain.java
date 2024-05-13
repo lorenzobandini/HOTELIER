@@ -8,9 +8,15 @@ import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
+import com.unipi.lorenzobandini.hotelier.model.ServerGroupProperties;
 
 import java.util.concurrent.ExecutorService;
 
@@ -23,13 +29,17 @@ public class HotelierServerMain {
         int minPoolSize = properties.getMinPoolSize();
         int maxPoolSize = properties.getMaxPoolSize();
         int keepAliveTime = properties.getKeepAliveTime();
-        int timerUpdates = properties.getTimerUpdates();
+        //int timerUpdates = properties.getTimerUpdates();
         try{
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()));
             ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
             System.out.println("Server started at address "+ properties.getAddress() +" and port " + properties.getPortNumber());
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
+                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
+                .create();
 
             //executor.submit(new HotelierUpdaterChart(timerUpdates, gson));
 
