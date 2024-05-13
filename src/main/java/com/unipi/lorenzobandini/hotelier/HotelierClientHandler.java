@@ -343,36 +343,41 @@ public class HotelierClientHandler implements Runnable {
     private List<User> getListUsers() throws IOException {
 
         File file = new File("src/main/resources/Users.json");
-        BufferedReader br = new BufferedReader(new FileReader(file));
         Type userListType = new TypeToken<ArrayList<User>>(){}.getType();
         List<User> users = new ArrayList<>();
+
         if (file.length() != 0) {
-            users = this.gson.fromJson(br, userListType);
+            try(BufferedReader br = new BufferedReader(new FileReader(file))){
+                users = this.gson.fromJson(br, userListType);
+            }
         }
         return users;
     }
 
     private List<Hotel> getListHotels() throws IOException {
-
         File file = new File("src/main/resources/Hotels.json");
-        BufferedReader br = new BufferedReader(new FileReader(file));
         Type hotelListType = new TypeToken<ArrayList<Hotel>>(){}.getType();
         List<Hotel> hotels = new ArrayList<>();
+     
         if (file.length() != 0) {
-            hotels = this.gson.fromJson(br, hotelListType);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                hotels = this.gson.fromJson(br, hotelListType);
+            }
         }
         return hotels;
     }
 
     private List<HotelReviews> getListReviews() throws IOException {
-
         File file = new File("src/main/resources/Reviews.json");
-        BufferedReader br = new BufferedReader(new FileReader(file));
         Type reviewsListType = new TypeToken<ArrayList<HotelReviews>>(){}.getType();
         List<HotelReviews> reviews = new ArrayList<>();
+    
         if (file.length() != 0) {
-            reviews = this.gson.fromJson(br, reviewsListType);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                reviews = this.gson.fromJson(br, reviewsListType);
+            }
         }
+    
         return reviews;
     }
 
@@ -428,8 +433,12 @@ public class HotelierClientHandler implements Runnable {
         int score = 0;
         while (score < 1 || score > 5) {
             writer.println(yellow +"Insert the " + scoreType + "score of the hotel from 1 to 5" + reset);
-            score = Integer.parseInt(reader.readLine());
-            if (score < 1 || score > 5) {
+            try{
+                score = Integer.parseInt(reader.readLine());
+                if (score < 1 || score > 5) {
+                    writer.println(red +"Invalid score!"+reset);
+                }
+            }catch(NumberFormatException e){
                 writer.println(red +"Invalid score!"+reset);
             }
         }
