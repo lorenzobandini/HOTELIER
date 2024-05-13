@@ -15,22 +15,24 @@ import com.google.gson.GsonBuilder;
 import java.util.concurrent.ExecutorService;
 
 
-public class HotelierClientMain {
+public class HotelierServerMain {
  
     public static void main(String[] args) {
-        GroupProperties properties = getPropertiesServer();
+        ServerGroupProperties properties = getPropertiesServer();
         
         int minPoolSize = properties.getMinPoolSize();
         int maxPoolSize = properties.getMaxPoolSize();
         int keepAliveTime = properties.getKeepAliveTime();
-
+        int timerUpdates = properties.getTimerUpdates();
         try{
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()));
             ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
             System.out.println("Server started at address "+ properties.getAddress() +" and port " + properties.getPortNumber());
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            
+
+            //executor.submit(new HotelierUpdaterChart(timerUpdates, gson));
+
             try {
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
@@ -46,7 +48,7 @@ public class HotelierClientMain {
         
     }
 
-    private static GroupProperties getPropertiesServer() {
+    private static ServerGroupProperties getPropertiesServer() {
         Properties properties = getProperties();
         
         String socket = properties.getProperty("socket");
@@ -54,8 +56,9 @@ public class HotelierClientMain {
         String minPoolSize = properties.getProperty("minPoolSize");
         String maxPoolSize = properties.getProperty("maxPoolSize");
         String keepAliveTime = properties.getProperty("keepAliveTime");
+        String timerUpdates = properties.getProperty("timerUpdates");
 
-        return new GroupProperties(socket, portNumber, Integer.parseInt(minPoolSize), Integer.parseInt(maxPoolSize), Integer.parseInt(keepAliveTime));
+        return new ServerGroupProperties(socket, portNumber, Integer.parseInt(minPoolSize), Integer.parseInt(maxPoolSize), Integer.parseInt(keepAliveTime), Integer.parseInt(timerUpdates));
     }
 
     private static Properties getProperties() {
@@ -66,42 +69,5 @@ public class HotelierClientMain {
             e.printStackTrace();
         }
         return properties;
-    }
-}
-
-class GroupProperties {
-
-    private String address;
-    private String portNumber;
-    private int minPoolSize;
-    private int maxPoolSize;
-    private int keepAliveTime;
-
-    public GroupProperties(String socket, String portNumber, int minPoolSize, int maxPoolSize, int keepAliveTime) {
-        this.address = socket;
-        this.portNumber = portNumber;   
-        this.minPoolSize = minPoolSize;
-        this.maxPoolSize = maxPoolSize;
-        this.keepAliveTime = keepAliveTime;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getPortNumber() {
-        return portNumber;
-    }
-
-    public int getMinPoolSize() {
-        return minPoolSize;
-    }
-
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public int getKeepAliveTime() {
-        return keepAliveTime;
     }
 }
