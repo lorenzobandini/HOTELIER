@@ -19,6 +19,10 @@ import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.unipi.lorenzobandini.hotelier.model.Hotel;
+import com.unipi.lorenzobandini.hotelier.model.HotelReviews;
+import com.unipi.lorenzobandini.hotelier.model.Review;
+import com.unipi.lorenzobandini.hotelier.model.User;
 
 
 public class HotelierClientHandler implements Runnable {

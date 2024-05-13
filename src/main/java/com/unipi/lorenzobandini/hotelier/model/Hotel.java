@@ -1,4 +1,4 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.model;
 
 import java.util.List;
 import java.util.Map;

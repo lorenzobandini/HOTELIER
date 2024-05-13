@@ -1,9 +1,9 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class HotelReviews{
+public class HotelReviews{
     private String hotelName;
     private String city;
     private int numReviews = 0;

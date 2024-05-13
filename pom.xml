@@ -33,7 +33,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.2.0</version>
             <configuration>
-                <mainClass>com.unipi.lorenzobandini.hotelier.HotelierClientMain</mainClass>
+                <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
             </configuration>
         </plugin>
     </plugins>

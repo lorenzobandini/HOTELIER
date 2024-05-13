@@ -1,8 +1,11 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.model;
+
+import java.time.LocalDate;
 
 public class Review{
     private String reviewer;
     private int globalScore;
+    private LocalDate date = LocalDate.now();
     private int[] scores;
 
     public Review(String reviewer, int globalScore, int[] scores){
@@ -21,5 +24,9 @@ public class Review{
 
     public int[] getScores(){
         return this.scores;
+    }
+
+    public LocalDate getDate(){
+        return this.date;
     }
 }
