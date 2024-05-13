@@ -310,6 +310,7 @@ public class HotelierClientHandler implements Runnable {
                     this.gson.toJson(allHotelsReviews, fileWriter);
                     fileWriter.flush();
                     fileWriter.close();
+                    updateBadge();
                     writer.println(green +"Review added successfully"+reset);
                     return;
                 }
@@ -318,15 +319,11 @@ public class HotelierClientHandler implements Runnable {
             hotelReviews.addReview(review);
             allHotelsReviews.add(hotelReviews);
             FileWriter fileWriter = new FileWriter("src/main/resources/Reviews.json");
-            try{
-                this.gson.toJson(allHotelsReviews, fileWriter);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
+            this.gson.toJson(allHotelsReviews, fileWriter);
             fileWriter.flush();
             fileWriter.close();
+            updateBadge();
             writer.println(green +"Review added successfully"+reset);
-            
         }
     }
 
@@ -407,6 +404,23 @@ public class HotelierClientHandler implements Runnable {
                 }
             }
             return true;
+        }
+    }
+
+    private void updateBadge() throws IOException {
+        synchronized (lockUsers) {
+            List<User> users = getListUsers();
+        
+            for (User existingUser : users) {
+                if (existingUser.getUsername().equals(this.currentUsername)) {
+                    existingUser.addReview();
+                    FileWriter fileWriter = new FileWriter("src/main/resources/Users.json");
+                    this.gson.toJson(users, fileWriter);
+                    fileWriter.flush();
+                    fileWriter.close();
+                    return;
+                }
+            }
         }
     }
 
