@@ -1,7 +1,6 @@
 package com.unipi.lorenzobandini.hotelier.model;
 
 import java.util.List;
-import java.util.Map;
 
 public class Hotel {
     private int id;
@@ -10,17 +9,18 @@ public class Hotel {
     private String city;
     private String phone;
     private List<String> services;
-    private int rate;
-    private Map<String, Integer> ratings;
+    private float rate;
+    private Ratings ratings;
 
-    public Hotel(int id, String name, String description, String city, String phone, List<String> services, int rate, Map<String, Integer> ratings) {
+    public Hotel(int id, String name, String description, String city, String phone, List<String> services, float rate,
+            Ratings ratings) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.city = city;
         this.phone = phone;
         this.services = services;
-        this.rate = rate;
+        this.rate = Math.round(rate * 10) / 10.0f;
         this.ratings = ratings;
     }
 
@@ -72,19 +72,19 @@ public class Hotel {
         this.services = services;
     }
 
-    public int getRate() {
+    public float getRate() {
         return rate;
     }
 
-    public void setRate(int rate) {
-        this.rate = rate;
+    public void setRate(float f) {
+        this.rate = Math.round(f * 10) / 10.0f;
     }
 
-    public Map<String, Integer> getRatings() {
+    public Ratings getRatings() {
         return ratings;
     }
 
-    public void setRatings(Map<String, Integer> ratings) {
+    public void setRatings(Ratings ratings) {
         this.ratings = ratings;
     }
 }
