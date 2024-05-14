@@ -5,15 +5,13 @@ import java.net.ConnectException;
 import java.net.Socket;
 
 public class HotelierClientMain {
- 
+
     public static void main(String[] args) {
         GroupProperties properties = getPropertiesClient();
-        
-        // Stampare a video le proprietà
+
         System.out.println("Address: " + properties.getAddress());
         System.out.println("Port Number: " + properties.getPortNumber());
-
-        try(Socket clientSocket = new Socket(properties.getAddress(), Integer.parseInt(properties.getPortNumber()))){
+        try (Socket clientSocket = new Socket(properties.getAddress(), Integer.parseInt(properties.getPortNumber()))) {
             System.out.println("Connessione stabilita con " + clientSocket.getRemoteSocketAddress());
 
             Thread listener = new Thread(new ClientListener(clientSocket));
@@ -24,12 +22,12 @@ public class HotelierClientMain {
 
             listener.join();
             writer.join();
-            
+
             clientSocket.close();
 
-        }catch(ConnectException e){
+        } catch (ConnectException e) {
             System.out.println("Server non disponibile");
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -37,10 +35,10 @@ public class HotelierClientMain {
 
     private static GroupProperties getPropertiesClient() {
         Properties properties = getProperties();
-        
+
         String socket = properties.getProperty("socket");
         String portNumber = properties.getProperty("portNumber");
-        
+
         return new GroupProperties(socket, portNumber);
     }
 
@@ -55,7 +53,6 @@ public class HotelierClientMain {
     }
 }
 
-
 class GroupProperties {
 
     private String address;
@@ -63,7 +60,7 @@ class GroupProperties {
 
     public GroupProperties(String socket, String portNumber) {
         this.address = socket;
-        this.portNumber = portNumber;   
+        this.portNumber = portNumber;
     }
 
     public String getAddress() {
