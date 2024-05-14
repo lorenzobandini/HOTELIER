@@ -13,7 +13,7 @@ public class HotelierClientMain {
         System.out.println("Address: " + properties.getAddress());
         System.out.println("Port Number: " + properties.getPortNumber());
 
-        try(Socket clientSocket = new Socket("localhost", 8080)){
+        try(Socket clientSocket = new Socket(properties.getAddress(), Integer.parseInt(properties.getPortNumber()))){
             System.out.println("Connessione stabilita con " + clientSocket.getRemoteSocketAddress());
 
             Thread listener = new Thread(new ClientListener(clientSocket));
