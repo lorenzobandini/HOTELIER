@@ -2,6 +2,7 @@ package com.unipi.lorenzobandini.hotelier;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
@@ -20,47 +21,56 @@ import com.unipi.lorenzobandini.hotelier.model.ServerGroupProperties;
 
 import java.util.concurrent.ExecutorService;
 
-
 public class HotelierServerMain {
- 
+
     public static void main(String[] args) {
         ServerGroupProperties properties = getPropertiesServer();
-        
+
         int minPoolSize = properties.getMinPoolSize();
         int maxPoolSize = properties.getMaxPoolSize();
         int keepAliveTime = properties.getKeepAliveTime();
-        //int timerUpdates = properties.getTimerUpdates();
-        try{
-            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()));
-            ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-            System.out.println("Server started at address "+ properties.getAddress() +" and port " + properties.getPortNumber());
+        // int timerUpdates = properties.getTimerUpdates();
+        try {
+            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()), 0,
+                    InetAddress.getByName(properties.getAddress()));
+            ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<Runnable>());
+            System.out.println(
+                    "Server started at address " + properties.getAddress() + " and port " + properties.getPortNumber());
 
+            final Object lockHotels = new Object();
             Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
-                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
-                .create();
+                    .setPrettyPrinting()
+                    .registerTypeAdapter(LocalDate.class,
+                            (JsonSerializer<LocalDate>) (src, typeOfSrc,
+                                    context) -> new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
+                    .registerTypeAdapter(LocalDate.class,
+                            (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> LocalDate
+                                    .parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
+                    .create();
 
-            //executor.submit(new HotelierUpdaterChart(timerUpdates, gson));
+            // executor.submit(new HotelierUpdaterChart(timerUpdates, gson, lockHotels));
+            // TODO: aggiornare lista hotel, passare i lock condivisi, fare connessione udp
+            // sia client che server, capire meglio come fare chart.
 
             try {
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    executor.submit(new HotelierClientHandler(clientSocket, gson));
+                    executor.submit(new HotelierClientHandler(clientSocket, gson, lockHotels));
                     System.out.println("Client connected at port " + clientSocket.getPort());
                 }
             } finally {
                 serverSocket.close();
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 
     private static ServerGroupProperties getPropertiesServer() {
         Properties properties = getProperties();
-        
+
         String socket = properties.getProperty("socket");
         String portNumber = properties.getProperty("portNumber");
         String minPoolSize = properties.getProperty("minPoolSize");
@@ -68,7 +78,8 @@ public class HotelierServerMain {
         String keepAliveTime = properties.getProperty("keepAliveTime");
         String timerUpdates = properties.getProperty("timerUpdates");
 
-        return new ServerGroupProperties(socket, portNumber, Integer.parseInt(minPoolSize), Integer.parseInt(maxPoolSize), Integer.parseInt(keepAliveTime), Integer.parseInt(timerUpdates));
+        return new ServerGroupProperties(socket, portNumber, Integer.parseInt(minPoolSize),
+                Integer.parseInt(maxPoolSize), Integer.parseInt(keepAliveTime), Integer.parseInt(timerUpdates));
     }
 
     private static Properties getProperties() {
