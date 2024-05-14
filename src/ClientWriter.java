@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientWriter implements Runnable{
+public class ClientWriter implements Runnable {
 
     private Socket clientSocket;
     private PrintWriter out;
@@ -21,9 +21,9 @@ public class ClientWriter implements Runnable{
 
     @Override
     public void run() {
-        // Scrivi al server in continuazione
+
         String message;
-        while (!(message = scanner.nextLine()).equals("exit")) {
+        while (scanner.hasNextLine() && !(message = scanner.nextLine()).equals("exit")) {
             out.println(message);
         }
         out.println("exit");
