@@ -1,45 +1,77 @@
-import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HotelierClientMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         GroupProperties properties = getPropertiesClient();
 
         System.out.println("Address: " + properties.getAddress());
         System.out.println("Port Number: " + properties.getPortNumber());
-        try (Socket clientSocket = new Socket(properties.getAddress(), Integer.parseInt(properties.getPortNumber()))) {
-            System.out.println("Connessione stabilita con " + clientSocket.getRemoteSocketAddress());
+        System.out.println("Multicast Address: " + properties.getMulticastAddress());
+        System.out.println("Multicast Port: " + properties.getMulticastPort());
 
-            Thread listener = new Thread(new ClientListener(clientSocket));
-            Thread writer = new Thread(new ClientWriter(clientSocket));
+        AtomicBoolean isConnected = new AtomicBoolean(true);
+        ExecutorService executor = Executors.newFixedThreadPool(3);
 
-            listener.start();
-            writer.start();
+        try {
+            int portNumber = Integer.parseInt(properties.getPortNumber());
+            int multicastPort = Integer.parseInt(properties.getMulticastPort());
 
-            listener.join();
-            writer.join();
+            try (Socket clientSocket = new Socket(properties.getAddress(), portNumber);
+                    MulticastSocket multicastSocket = new MulticastSocket(multicastPort)) {
+                InetAddress group = InetAddress.getByName(properties.getMulticastAddress());
+                SocketAddress socketAddress = new InetSocketAddress(group, multicastSocket.getLocalPort());
+                multicastSocket.joinGroup(socketAddress, null);
+                System.out.println("Connection established with " + clientSocket.getRemoteSocketAddress());
+                System.out.println("Multicast connection established with " + socketAddress);
 
-            clientSocket.close();
+                Thread clientListenerThread = new Thread(new ClientListener(clientSocket));
+                Thread clientWriterThread = new Thread(new ClientWriter(clientSocket, isConnected));
+                Thread multicastListenerThread = new Thread(
+                        new MulticastListener(multicastSocket, isConnected));
 
-        } catch (ConnectException e) {
-            System.out.println("Server non disponibile");
-        } catch (Exception e) {
-            e.printStackTrace();
+                try {
+                    clientListenerThread.start();
+                    clientWriterThread.start();
+                    multicastListenerThread.start();
+
+                    clientListenerThread.join();
+                    clientWriterThread.join();
+                    multicastListenerThread.join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error: Unable to establish connection.");
+                e.printStackTrace();
+            } finally {
+                executor.shutdown();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Port number must be an integer.");
         }
-
     }
 
     private static GroupProperties getPropertiesClient() {
         Properties properties = getProperties();
 
-        String socket = properties.getProperty("socket");
+        String socket = properties.getProperty("address");
         String portNumber = properties.getProperty("portNumber");
+        String multicastAddress = properties.getProperty("multicastAddress");
+        String multicastPort = properties.getProperty("multicastPort");
 
-        return new GroupProperties(socket, portNumber);
+        return new GroupProperties(socket, portNumber, multicastAddress, multicastPort);
     }
 
     private static Properties getProperties() {
@@ -50,24 +82,5 @@ public class HotelierClientMain {
             e.printStackTrace();
         }
         return properties;
-    }
-}
-
-class GroupProperties {
-
-    private String address;
-    private String portNumber;
-
-    public GroupProperties(String socket, String portNumber) {
-        this.address = socket;
-        this.portNumber = portNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getPortNumber() {
-        return portNumber;
     }
 }
