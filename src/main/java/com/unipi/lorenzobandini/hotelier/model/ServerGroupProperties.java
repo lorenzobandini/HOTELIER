@@ -4,18 +4,23 @@ public class ServerGroupProperties {
 
     private String address;
     private String portNumber;
-    private int minPoolSize;
-    private int maxPoolSize;
-    private int keepAliveTime;
-    private int timerUpdates;
+    private String minPoolSize;
+    private String maxPoolSize;
+    private String keepAliveTime;
+    private String timerUpdates;
+    private String multicastAddress;
+    private String multicastPort;
 
-    public ServerGroupProperties(String socket, String portNumber, int minPoolSize, int maxPoolSize, int keepAliveTime, int timerUpdates) {
-        this.address = socket;
-        this.portNumber = portNumber;   
+    public ServerGroupProperties(String address, String portNumber, String minPoolSize, String maxPoolSize,
+            String keepAliveTime, String timerUpdates, String multicastAddress, String multicastPort) {
+        this.address = address;
+        this.portNumber = portNumber;
         this.minPoolSize = minPoolSize;
         this.maxPoolSize = maxPoolSize;
         this.keepAliveTime = keepAliveTime;
         this.timerUpdates = timerUpdates;
+        this.multicastAddress = multicastAddress;
+        this.multicastPort = multicastPort;
     }
 
     public String getAddress() {
@@ -26,19 +31,27 @@ public class ServerGroupProperties {
         return portNumber;
     }
 
-    public int getMinPoolSize() {
+    public String getMinPoolSize() {
         return minPoolSize;
     }
 
-    public int getMaxPoolSize() {
+    public String getMaxPoolSize() {
         return maxPoolSize;
     }
 
-    public int getKeepAliveTime() {
+    public String getKeepAliveTime() {
         return keepAliveTime;
     }
 
-    public int getTimerUpdates() {
+    public String getTimerUpdates() {
         return timerUpdates;
+    }
+
+    public String getMulticastAddress() {
+        return multicastAddress;
+    }
+
+    public String getMulticastPort() {
+        return multicastPort;
     }
 }
