@@ -3,6 +3,7 @@ package com.unipi.lorenzobandini.hotelier;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
@@ -26,18 +27,23 @@ public class HotelierServerMain {
     public static void main(String[] args) {
         ServerGroupProperties properties = getPropertiesServer();
 
-        int minPoolSize = properties.getMinPoolSize();
-        int maxPoolSize = properties.getMaxPoolSize();
-        int keepAliveTime = properties.getKeepAliveTime();
+        int minPoolSize = Integer.parseInt(properties.getMinPoolSize());
+        int maxPoolSize = Integer.parseInt(properties.getMaxPoolSize());
+        int keepAliveTime = Integer.parseInt(properties.getKeepAliveTime());
         // int timerUpdates = properties.getTimerUpdates();
         try {
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()), 0,
                     InetAddress.getByName(properties.getAddress()));
+
+            MulticastSocket multicastSocket = new MulticastSocket(Integer.parseInt(properties.getMulticastPort()));
+
             ExecutorService executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
                     new LinkedBlockingQueue<Runnable>());
+
             System.out.println(
                     "Server started at address " + properties.getAddress() + " and port " + properties.getPortNumber());
-
+            System.out.println("Server multicast started at address " + properties.getMulticastAddress() + " and port "
+                    + properties.getMulticastPort());
             final Object lockHotels = new Object();
             Gson gson = new GsonBuilder()
                     .setPrettyPrinting()
@@ -49,19 +55,27 @@ public class HotelierServerMain {
                                     .parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
                     .create();
 
-            // executor.submit(new HotelierUpdaterChart(timerUpdates, gson, lockHotels));
-            // TODO: aggiornare lista hotel, passare i lock condivisi, fare connessione udp
-            // sia client che server, capire meglio come fare chart.
+            new Thread(new HotelierUpdaterChart(Integer.parseInt(properties.getTimerUpdates()), gson, multicastSocket,
+                    Integer.parseInt(properties.getMulticastPort()), properties.getMulticastAddress()))
+                    .start();
 
-            try {
-                while (true) {
-                    Socket clientSocket = serverSocket.accept();
-                    executor.submit(new HotelierClientHandler(clientSocket, gson, lockHotels));
-                    System.out.println("Client connected at port " + clientSocket.getPort());
+            new Thread(() -> {
+                try {
+                    while (true) {
+                        Socket clientSocket = serverSocket.accept();
+                        executor.submit(new HotelierClientHandler(clientSocket, gson, lockHotels));
+                        System.out.println("Client connected at port " + clientSocket.getPort());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        serverSocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } finally {
-                serverSocket.close();
-            }
+            }).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,15 +85,17 @@ public class HotelierServerMain {
     private static ServerGroupProperties getPropertiesServer() {
         Properties properties = getProperties();
 
-        String socket = properties.getProperty("socket");
+        String address = properties.getProperty("address");
         String portNumber = properties.getProperty("portNumber");
         String minPoolSize = properties.getProperty("minPoolSize");
         String maxPoolSize = properties.getProperty("maxPoolSize");
         String keepAliveTime = properties.getProperty("keepAliveTime");
         String timerUpdates = properties.getProperty("timerUpdates");
+        String multicastAddress = properties.getProperty("multicastAddress");
+        String multicastPort = properties.getProperty("multicastPort");
 
-        return new ServerGroupProperties(socket, portNumber, Integer.parseInt(minPoolSize),
-                Integer.parseInt(maxPoolSize), Integer.parseInt(keepAliveTime), Integer.parseInt(timerUpdates));
+        return new ServerGroupProperties(address, portNumber, minPoolSize, maxPoolSize, keepAliveTime, timerUpdates,
+                multicastAddress, multicastPort);
     }
 
     private static Properties getProperties() {
