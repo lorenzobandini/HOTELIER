@@ -1,141 +1,222 @@
 package com.unipi.lorenzobandini.hotelier;
 
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.unipi.lorenzobandini.hotelier.model.Chart;
-import com.unipi.lorenzobandini.hotelier.model.Hotel;
+import com.unipi.lorenzobandini.hotelier.model.*;
 
 public class HotelierUpdaterChart implements Runnable {
+
+    String reset = "\u001B[0m";
+    String blue = "\u001B[34m";
+
 
     private int timerUpdates;
     private Gson gson;
     private MulticastSocket multicastSocket;
     private int multicastPort;
     private String multicastAddress;
+    private Object lockHotels;
+    private Object lockReviews;
 
     public HotelierUpdaterChart(int timerUpdates, Gson gson, MulticastSocket multicastSocket, int multicastPort,
-            String multicastAddress) {
+            String multicastAddress, Object lockHotels, Object lockReviews) {
         this.timerUpdates = timerUpdates;
         this.gson = gson;
         this.multicastSocket = multicastSocket;
         this.multicastPort = multicastPort;
         this.multicastAddress = multicastAddress;
+        this.lockHotels = lockHotels;
+        this.lockReviews = lockReviews;
     }
 
     @Override
     public void run() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        byte[] buf = ("Awake").getBytes();
-        InetAddress group;
-        try {
-            group = InetAddress.getByName(this.multicastAddress);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, group, this.multicastPort);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
             executor.scheduleAtFixedRate(() -> {
                 try {
-                    multicastSocket.send(packet);
-                } catch (IOException e) {
+                    String message = "Awake";
+                    sendMulticastMessage(message);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }, 0, 250, TimeUnit.MILLISECONDS);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        // createHotelierChart();
+
+        createHotelierChart();
+
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                List<Hotel> hotels = getListHotels();
+                List<Chart> charts = getListCharts();
+                for (Chart chart : charts) {
+                    String topHotelBeforeUpdate = chart.getTopHotelInChart().getName();
+                    for (Hotel hotel : hotels) {
+                        if (chart.getCity().equals(hotel.getCity())) {
+                            chart.updateHotel(hotel.getName(), calculateScore(hotel));
+                        }
+                    }
+                    
+                    chart.getHotels().sort((h1, h2) -> Float.compare(h2.getScore(), h1.getScore()));
+                    
+                    if (!topHotelBeforeUpdate.equals(chart.getTopHotelInChart().getName())) {
+                        String message = (blue + "The top hotel in the chart for " + chart.getCity() + " has changed to "
+                                + chart.getTopHotelInChart().getName() + reset);
+                        sendMulticastMessage(message);
+                    }
+                }
+
+                File file = new File("src/main/resources/Charts.json");
+                FileWriter fileWriter = new FileWriter(file);
+                this.gson.toJson(charts, fileWriter);
+                fileWriter.flush();
+                fileWriter.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, timerUpdates, timerUpdates, TimeUnit.SECONDS);
 
     }
 
-    // synchronized public void createHotelierChart() {
-    // try {
-    // // Leggi il file JSON
-    // File file = new File("src/main/resources/Hotels.json");
-    // BufferedReader br = new BufferedReader(new FileReader(file));
-    // Type userListType = new TypeToken<ArrayList<Hotel>>() {
-    // }.getType();
-    // List<Hotel> hotels = new ArrayList<>();
-    // if (file.length() != 0) {
-    // hotels = this.gson.fromJson(br, userListType);
-    // } else {
-    // br.close();
-    // return;
-    // }
+    public void createHotelierChart() {
+        synchronized (lockHotels) {
+            try {
+                List<Hotel> hotels = getListHotels();
+                List<Chart> charts = new ArrayList<>();
+                for (Hotel hotel : hotels) {
+                    boolean found = false;
+                    for (Chart chart : charts) {
+                        if (chart.getCity().equals(hotel.getCity())) {
+                            chart.addHotel(hotel.getName(), calculateScore(hotel));
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        Chart chart = new Chart(hotel.getCity());
+                        chart.addHotel(hotel.getName(), calculateScore(hotel));
+                        charts.add(chart);
+                    }
+                }
+                File file = new File("src/main/resources/Charts.json");
+                FileWriter fileWriter = new FileWriter(file);
+                this.gson.toJson(charts, fileWriter);
+                fileWriter.flush();
+                fileWriter.close();
 
-    // // Crea una mappa con le città e il numero di hotel per ogni città
-    // Map<String, Integer> cities = new LinkedHashMap<>();
-    // for (Hotel hotel : hotels) {
-    // if (cities.containsKey(hotel.getCity())) {
-    // cities.put(hotel.getCity(), cities.get(hotel.getCity()) + 1);
-    // } else {
-    // cities.put(hotel.getCity(), 1);
-    // }
-    // }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-    // // Crea un oggetto Chart per ogni città
-    // List<Chart> charts = new ArrayList<>();
+    private float calculateScore(Hotel hotel) {
+        synchronized (lockReviews) {
+            try {
+                List<HotelReviews> allReviews = getListReviews();
+                float totalScore = 0;
+                int count = 0;
+                for (HotelReviews hotelReviews : allReviews) {
+                    if (hotelReviews.getHotelName().equals(hotel.getName())) {
+                        for (Review review : hotelReviews.getReviews()) {
+                            LocalDate dateReview = review.getDate();
+                            float globalScore = review.getGlobalScore();
+                            Ratings scores = review.getRatings();
 
-    // for (Map.Entry<String, Integer> entry : cities.entrySet()) {
-    // Chart chart = new Chart(entry.getKey());
-    // chart.getHotels().put("Hotels", entry.getValue());
-    // charts.add(chart);
-    // }
+                            float reviewScore = (scores.getCleaning() + scores.getPosition() + scores.getQuality()
+                                    + scores.getServices()) * globalScore;
 
-    // // Scrivi le mappe in un file JSON
-    // this.gson.toJson(charts);
-    // br.close();
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // }
-    // }
+                            long daysSinceReview = ChronoUnit.DAYS.between(dateReview, LocalDate.now());
+                            reviewScore /= (daysSinceReview + 1);
 
-    // synchronized public void updateHotelierChart() {
-    // try {
-    // // Leggi il file JSON
-    // File file = new File("src/main/resources/Charts.json");
-    // BufferedReader br = new BufferedReader(new FileReader(file));
-    // Type chartListType = new TypeToken<ArrayList<Chart>>() {
-    // }.getType();
-    // List<Chart> charts = new ArrayList<>();
-    // if (file.length() != 0) {
-    // charts = this.gson.fromJson(br, chartListType);
-    // } else {
-    // br.close();
-    // return;
-    // }
+                            reviewScore *= globalScore;
 
-    // // Ordina le mappe hotels in ogni oggetto Chart
-    // for (Chart chart : charts) {
-    // List<Map.Entry<String, Integer>> list = new
-    // ArrayList<>(chart.getHotels().entrySet());
-    // list.sort(Map.Entry.comparingByValue());
+                            totalScore += reviewScore;
+                            count++;
+                        }
+                    }
+                }
 
-    // // Aggiorna la mappa con l'ordine ordinato
-    // Map<String, Integer> sortedHotels = new LinkedHashMap<>();
-    // for (Map.Entry<String, Integer> entry : list) {
-    // sortedHotels.put(entry.getKey(), entry.getValue());
-    // }
-    // chart.setHotels(sortedHotels);
-    // br.close();
-    // return;
-    // }
+                return count > 0 ? totalScore / count : 0;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return 0;
+        }
+    }
 
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
+    private void sendMulticastMessage(String message) {
+    byte[] buffer = message.getBytes();
+
+    try {
+        InetAddress groupForPacket = InetAddress.getByName(this.multicastAddress); 
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupForPacket, this.multicastPort );
+
+        multicastSocket.send(packet);
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+    private List<Hotel> getListHotels() throws IOException {
+        File file = new File("src/main/resources/Hotels.json");
+        Type hotelListType = new TypeToken<ArrayList<Hotel>>() {
+        }.getType();
+        List<Hotel> hotels = new ArrayList<>();
+
+        if (file.length() != 0) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                hotels = this.gson.fromJson(br, hotelListType);
+            }
+        }
+        return hotels;
+    }
+
+    private List<HotelReviews> getListReviews() throws IOException {
+        File file = new File("src/main/resources/Reviews.json");
+        Type reviewsListType = new TypeToken<ArrayList<HotelReviews>>() {
+        }.getType();
+        List<HotelReviews> reviews = new ArrayList<>();
+
+        if (file.length() != 0) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                reviews = this.gson.fromJson(br, reviewsListType);
+            }
+        }
+
+        return reviews;
+    }
+
+    private List<Chart> getListCharts() throws IOException {
+        File file = new File("src/main/resources/Charts.json");
+        Type chartListType = new TypeToken<ArrayList<Chart>>() {
+        }.getType();
+        List<Chart> charts = new ArrayList<>();
+
+        if (file.length() != 0) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                charts = this.gson.fromJson(br, chartListType);
+            }
+        }
+
+        return charts;
+    }
+
 }

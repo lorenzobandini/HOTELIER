@@ -1,29 +1,44 @@
 package com.unipi.lorenzobandini.hotelier.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-public class Chart{
-    private String città;
-    private Map<String, Integer> hotels = new LinkedHashMap<>();
+public class Chart {
+    private String city;
+    private List<HotelInChart> hotels = new ArrayList<>();
 
-    public Chart(String città) {
-        this.città = città;
+    public Chart(String city) {
+        this.city = city;
     }
 
-    public String getCittà() {
-        return città;
+    public String getCity() {
+        return city;
     }
 
-    public void setCittà(String città) {
-        this.città = città;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public Map<String, Integer> getHotels() {
+    public void addHotel(String name, float score) {
+        hotels.add(new HotelInChart(name, score));
+        hotels.sort(Comparator.comparing(HotelInChart::getScore).reversed());
+    }
+
+    public void updateHotel(String name, float score) {
+        for (HotelInChart hotel : hotels) {
+            if (hotel.getName().equals(name)) {
+                hotel.setScore(score);
+                break;
+            }
+        }
+    }
+
+    public HotelInChart getTopHotelInChart() {
+        return hotels.get(0);
+    }
+
+    public List<HotelInChart> getHotels() {
         return hotels;
-    }
-
-    public void setHotels(Map<String, Integer> hotels) {
-        this.hotels = hotels;
     }
 }
