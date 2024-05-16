@@ -40,12 +40,13 @@ public class HotelierClientHandler implements Runnable {
 
     private final Object lockUsers = new Object();
     private final Object lockHotels;
-    private final Object lockReviews = new Object();
+    private final Object lockReviews;
 
-    public HotelierClientHandler(Socket clientSocket, Gson gson, Object lockHotels) {
+    public HotelierClientHandler(Socket clientSocket, Gson gson, Object lockHotels, Object lockReviews) {
         this.clientSocket = clientSocket;
         this.gson = gson;
         this.lockHotels = lockHotels;
+        this.lockReviews = lockReviews;
     }
 
     @Override
@@ -54,6 +55,7 @@ public class HotelierClientHandler implements Runnable {
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             String username, password, hotelName, city, clientMessage;
+            writer.println();
             writer.println(yellow +
                     "██╗  ██╗ ██████╗ ████████╗███████╗██╗     ██╗███████╗██████╗ \n" +
                     "██║  ██║██╔═══██╗╚══██╔══╝██╔════╝██║     ██║██╔════╝██╔══██╗\n" +
@@ -323,9 +325,9 @@ public class HotelierClientHandler implements Runnable {
                     this.gson.toJson(allHotelsReviews, fileWriter);
                     fileWriter.flush();
                     fileWriter.close();
+                    updateHotelRate(hotelName, city);
                     updateBadge();
                     writer.println(green + "Review added successfully" + reset);
-                    updateHotelRate(hotelName, city);
                     return;
                 }
             }
@@ -336,6 +338,7 @@ public class HotelierClientHandler implements Runnable {
             this.gson.toJson(allHotelsReviews, fileWriter);
             fileWriter.flush();
             fileWriter.close();
+            updateHotelRate(hotelName, city);
             updateBadge();
             writer.println(green + "Review added successfully" + reset);
         }

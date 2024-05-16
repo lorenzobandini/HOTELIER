@@ -45,6 +45,7 @@ public class HotelierServerMain {
             System.out.println("Server multicast started at address " + properties.getMulticastAddress() + " and port "
                     + properties.getMulticastPort());
             final Object lockHotels = new Object();
+            final Object lockReviews = new Object();
             Gson gson = new GsonBuilder()
                     .setPrettyPrinting()
                     .registerTypeAdapter(LocalDate.class,
@@ -56,14 +57,15 @@ public class HotelierServerMain {
                     .create();
 
             new Thread(new HotelierUpdaterChart(Integer.parseInt(properties.getTimerUpdates()), gson, multicastSocket,
-                    Integer.parseInt(properties.getMulticastPort()), properties.getMulticastAddress()))
+                    Integer.parseInt(properties.getMulticastPort()), properties.getMulticastAddress(), lockHotels,
+                    lockReviews))
                     .start();
 
             new Thread(() -> {
                 try {
                     while (true) {
                         Socket clientSocket = serverSocket.accept();
-                        executor.submit(new HotelierClientHandler(clientSocket, gson, lockHotels));
+                        executor.submit(new HotelierClientHandler(clientSocket, gson, lockHotels, lockReviews));
                         System.out.println("Client connected at port " + clientSocket.getPort());
                     }
                 } catch (IOException e) {
