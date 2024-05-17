@@ -26,7 +26,6 @@ public class HotelierUpdaterChart implements Runnable {
     String reset = "\u001B[0m";
     String blue = "\u001B[34m";
 
-
     private int timerUpdates;
     private Gson gson;
     private MulticastSocket multicastSocket;
@@ -49,14 +48,14 @@ public class HotelierUpdaterChart implements Runnable {
     @Override
     public void run() {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-            executor.scheduleAtFixedRate(() -> {
-                try {
-                    String message = "Awake";
-                    sendMulticastMessage(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }, 0, 250, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                String message = "Awake";
+                sendMulticastMessage(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 0, 250, TimeUnit.MILLISECONDS);
 
         createHotelierChart();
 
@@ -71,11 +70,12 @@ public class HotelierUpdaterChart implements Runnable {
                             chart.updateHotel(hotel.getName(), calculateScore(hotel));
                         }
                     }
-                    
+
                     chart.getHotels().sort((h1, h2) -> Float.compare(h2.getScore(), h1.getScore()));
-                    
+
                     if (!topHotelBeforeUpdate.equals(chart.getTopHotelInChart().getName())) {
-                        String message = (blue + "The top hotel in the chart for " + chart.getCity() + " has changed to "
+                        String message = (blue + "The top hotel in the chart for " + chart.getCity()
+                                + " has changed to "
                                 + chart.getTopHotelInChart().getName() + reset);
                         sendMulticastMessage(message);
                     }
@@ -138,12 +138,12 @@ public class HotelierUpdaterChart implements Runnable {
                             LocalDate dateReview = review.getDate();
                             float globalScore = review.getGlobalScore();
                             Ratings scores = review.getRatings();
+                            long daysSinceReview = ChronoUnit.DAYS.between(dateReview, LocalDate.now());
 
                             float reviewScore = (scores.getCleaning() + scores.getPosition() + scores.getQuality()
                                     + scores.getServices()) * globalScore;
 
-                            long daysSinceReview = ChronoUnit.DAYS.between(dateReview, LocalDate.now());
-                            reviewScore /= (daysSinceReview + 1);
+                            reviewScore -= (daysSinceReview / 30) * reviewScore * 0.1;
 
                             reviewScore *= globalScore;
 
@@ -153,7 +153,7 @@ public class HotelierUpdaterChart implements Runnable {
                     }
                 }
 
-                return count > 0 ? totalScore / count : 0;
+                return (float) (count > 0 ? (totalScore / count) * (Math.log(1 + count)) : 0);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -162,18 +162,18 @@ public class HotelierUpdaterChart implements Runnable {
     }
 
     private void sendMulticastMessage(String message) {
-    byte[] buffer = message.getBytes();
+        byte[] buffer = message.getBytes();
 
-    try {
-        InetAddress groupForPacket = InetAddress.getByName(this.multicastAddress); 
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupForPacket, this.multicastPort );
+        try {
+            InetAddress groupForPacket = InetAddress.getByName(this.multicastAddress);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupForPacket, this.multicastPort);
 
-        multicastSocket.send(packet);
+            multicastSocket.send(packet);
 
-    } catch (IOException e) {
-        e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     private List<Hotel> getListHotels() throws IOException {
         File file = new File("src/main/resources/Hotels.json");
