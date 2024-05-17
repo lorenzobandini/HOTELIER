@@ -21,8 +21,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.unipi.lorenzobandini.hotelier.model.*;
 
+/**
+ * The HotelierUpdaterChart class is responsible for updating hotel charts based
+ * on reviews and scores.
+ * It periodically sends multicast messages and updates the hotel charts stored
+ * in a JSON file.
+ */
 public class HotelierUpdaterChart implements Runnable {
 
+    // ANSI escape codes
     String reset = "\u001B[0m";
     String blue = "\u001B[34m";
 
@@ -34,6 +41,17 @@ public class HotelierUpdaterChart implements Runnable {
     private Object lockHotels;
     private Object lockReviews;
 
+    /**
+     * Constructs a new HotelierUpdaterChart with the specified parameters.
+     *
+     * @param timerUpdates     the interval in seconds between updates
+     * @param gson             the Gson instance for JSON processing
+     * @param multicastSocket  the MulticastSocket for sending messages
+     * @param multicastPort    the port number for multicast messages
+     * @param multicastAddress the address for multicast messages
+     * @param lockHotels       the lock object for synchronizing hotel data access
+     * @param lockReviews      the lock object for synchronizing review data access
+     */
     public HotelierUpdaterChart(int timerUpdates, Gson gson, MulticastSocket multicastSocket, int multicastPort,
             String multicastAddress, Object lockHotels, Object lockReviews) {
         this.timerUpdates = timerUpdates;
@@ -45,9 +63,18 @@ public class HotelierUpdaterChart implements Runnable {
         this.lockReviews = lockReviews;
     }
 
+    /**
+     * The run method initiates the periodic tasks for sending multicast messages
+     * and updating hotel charts.
+     */
     @Override
     public void run() {
+
+        // Create a scheduled executor for sending multicast messages
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+
+        // Send a multicast message every 250 milliseconds for maintaining connected
+        // clients
         executor.scheduleAtFixedRate(() -> {
             try {
                 String message = "Awake";
@@ -57,12 +84,18 @@ public class HotelierUpdaterChart implements Runnable {
             }
         }, 0, 250, TimeUnit.MILLISECONDS);
 
+        // Create the initial hotel charts
         createHotelierChart();
 
+        // Update the hotel charts every timerUpdates seconds
         executor.scheduleAtFixedRate(() -> {
             try {
+
+                // Get the list of hotels and charts
                 List<Hotel> hotels = getListHotels();
                 List<Chart> charts = getListCharts();
+
+                // For each chart, update the hotels and sort them by score
                 for (Chart chart : charts) {
                     String topHotelBeforeUpdate = chart.getTopHotelInChart().getName();
                     for (Hotel hotel : hotels) {
@@ -81,6 +114,7 @@ public class HotelierUpdaterChart implements Runnable {
                     }
                 }
 
+                // Save the updated charts to a JSON file
                 File file = new File("src/main/resources/Charts.json");
                 FileWriter fileWriter = new FileWriter(file);
                 this.gson.toJson(charts, fileWriter);
@@ -94,9 +128,18 @@ public class HotelierUpdaterChart implements Runnable {
 
     }
 
+    /**
+     * Creates the initial hotel charts based on the current list of hotels and
+     * their scores.
+     * The charts are saved to a JSON file.
+     */
     public void createHotelierChart() {
+
+        // Synchronize access to the hotels JSON file
         synchronized (lockHotels) {
             try {
+
+                // Get the list of hotels and create a list of charts
                 List<Hotel> hotels = getListHotels();
                 List<Chart> charts = new ArrayList<>();
                 for (Hotel hotel : hotels) {
@@ -114,6 +157,8 @@ public class HotelierUpdaterChart implements Runnable {
                         charts.add(chart);
                     }
                 }
+
+                // Save the charts to a JSON file
                 File file = new File("src/main/resources/Charts.json");
                 FileWriter fileWriter = new FileWriter(file);
                 this.gson.toJson(charts, fileWriter);
@@ -126,33 +171,52 @@ public class HotelierUpdaterChart implements Runnable {
         }
     }
 
+    /**
+     * Calculates the score of a given hotel based on its reviews.
+     *
+     * @param hotel the Hotel object for which the score is calculated
+     * @return the calculated score
+     */
     private float calculateScore(Hotel hotel) {
+
+        // Synchronize access to the reviews JSON file
         synchronized (lockReviews) {
             try {
+
+                // Get the list of reviews and calculate the score for the given hotel
                 List<HotelReviews> allReviews = getListReviews();
                 float totalScore = 0;
                 int count = 0;
                 for (HotelReviews hotelReviews : allReviews) {
                     if (hotelReviews.getHotelName().equals(hotel.getName())) {
                         for (Review review : hotelReviews.getReviews()) {
+
                             LocalDate dateReview = review.getDate();
                             float globalScore = review.getGlobalScore();
                             Ratings scores = review.getRatings();
                             long daysSinceReview = ChronoUnit.DAYS.between(dateReview, LocalDate.now());
 
+                            // Calculate the review score
                             float reviewScore = (scores.getCleaning() + scores.getPosition() + scores.getQuality()
                                     + scores.getServices()) * globalScore;
 
+                            // Decrease the review score by 10% for each month since the review
                             reviewScore -= (daysSinceReview / 30) * reviewScore * 0.1;
 
+                            // Add more weight to the global score
                             reviewScore *= globalScore;
 
+                            // Add the review score to the total score of all reviews
                             totalScore += reviewScore;
+
+                            // Count the number of reviews
                             count++;
                         }
                     }
                 }
 
+                // Return the calculated score increased by the logarithm of the number of
+                // reviews
                 return (float) (count > 0 ? (totalScore / count) * (Math.log(1 + count)) : 0);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -161,6 +225,11 @@ public class HotelierUpdaterChart implements Runnable {
         }
     }
 
+    /**
+     * Sends a multicast message to the specified multicast address and port.
+     *
+     * @param message the message to be sent
+     */
     private void sendMulticastMessage(String message) {
         byte[] buffer = message.getBytes();
 
@@ -175,12 +244,26 @@ public class HotelierUpdaterChart implements Runnable {
         }
     }
 
+    /**
+     * Retrieves the list of hotels from the Hotels.json file.
+     *
+     * <p>
+     * This method reads the Hotels.json file and deserializes it into a list of
+     * Hotel objects using Gson. If the file is empty,
+     * an empty list is returned.
+     *
+     * @return the list of hotels
+     * @throws IOException if there is an error reading from the Hotels.json file
+     */
     private List<Hotel> getListHotels() throws IOException {
+
+        // Deserialize the JSON file into a list of Hotel objects
         File file = new File("src/main/resources/Hotels.json");
         Type hotelListType = new TypeToken<ArrayList<Hotel>>() {
         }.getType();
         List<Hotel> hotels = new ArrayList<>();
 
+        // Check if the file is empty then read the file
         if (file.length() != 0) {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 hotels = this.gson.fromJson(br, hotelListType);
@@ -189,12 +272,26 @@ public class HotelierUpdaterChart implements Runnable {
         return hotels;
     }
 
+    /**
+     * Retrieves the list of hotel reviews from the Reviews.json file.
+     *
+     * <p>
+     * This method reads the Reviews.json file and deserializes it into a list of
+     * HotelReviews objects using Gson. If the file is empty,
+     * an empty list is returned.
+     *
+     * @return the list of hotel reviews
+     * @throws IOException if there is an error reading from the Reviews.json file
+     */
     private List<HotelReviews> getListReviews() throws IOException {
+
+        // Deserialize the JSON file into a list of HotelReviews objects
         File file = new File("src/main/resources/Reviews.json");
         Type reviewsListType = new TypeToken<ArrayList<HotelReviews>>() {
         }.getType();
         List<HotelReviews> reviews = new ArrayList<>();
 
+        // Check if the file is empty then read the file
         if (file.length() != 0) {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 reviews = this.gson.fromJson(br, reviewsListType);
@@ -204,12 +301,26 @@ public class HotelierUpdaterChart implements Runnable {
         return reviews;
     }
 
+    /**
+     * Retrieves the list of charts from the Charts.json file.
+     *
+     * <p>
+     * This method reads the Charts.json file and deserializes it into a list of
+     * Chart objects using Gson. If the file is empty,
+     * an empty list is returned.
+     *
+     * @return the list of charts
+     * @throws IOException if there is an error reading from the Charts.json file
+     */
     private List<Chart> getListCharts() throws IOException {
+
+        // Deserialize the JSON file into a list of Chart objects
         File file = new File("src/main/resources/Charts.json");
         Type chartListType = new TypeToken<ArrayList<Chart>>() {
         }.getType();
         List<Chart> charts = new ArrayList<>();
 
+        // Check if the file is empty then read the file
         if (file.length() != 0) {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 charts = this.gson.fromJson(br, chartListType);
