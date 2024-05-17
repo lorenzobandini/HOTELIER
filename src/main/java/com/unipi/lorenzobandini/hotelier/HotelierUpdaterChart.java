@@ -195,13 +195,14 @@ public class HotelierUpdaterChart implements Runnable {
                             float globalScore = review.getGlobalScore();
                             Ratings scores = review.getRatings();
                             long daysSinceReview = ChronoUnit.DAYS.between(dateReview, LocalDate.now());
+                            float alpha = 0.01f;
 
                             // Calculate the review score
                             float reviewScore = (scores.getCleaning() + scores.getPosition() + scores.getQuality()
                                     + scores.getServices()) * globalScore;
 
-                            // Decrease the review score by 10% for each month since the review
-                            reviewScore -= (daysSinceReview / 30) * reviewScore * 0.1;
+                            // Decrease the review score based on the weeks since the review
+                            reviewScore *=  Math.exp(-alpha * daysSinceReview / 7);
 
                             // Add more weight to the global score
                             reviewScore *= globalScore;
