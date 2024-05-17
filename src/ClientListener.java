@@ -3,11 +3,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ClientListener implements Runnable{
+public class ClientListener implements Runnable {
 
     private Socket clientSocket;
     private BufferedReader in;
 
+    /**
+     * Constructs a new ClientListener with the specified client socket.
+     * <p>
+     * This constructor initializes the client socket and sets up a BufferedReader
+     * to read input from the socket's input stream. If an IOException occurs while
+     * setting up the BufferedReader, the exception's stack trace is printed.
+     *
+     * @param clientSocket the client socket for this ClientListener
+     */
     public ClientListener(Socket clientSocket) {
         this.clientSocket = clientSocket;
         try {
@@ -17,10 +26,13 @@ public class ClientListener implements Runnable{
         }
     }
 
+
     @Override
     public void run() {
-        // Leggi dal server in continuazione
+        
         String message;
+
+        // Continuously read input from the client socket and print it to the console
         try {
             while (!clientSocket.isClosed()) {
                 try {
@@ -30,7 +42,6 @@ public class ClientListener implements Runnable{
                     }
                     System.out.println(message);
                 } catch (IOException e) {
-                    // Il BufferedReader è stato chiuso
                     break;
                 }
             }

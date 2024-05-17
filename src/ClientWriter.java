@@ -11,6 +11,21 @@ public class ClientWriter implements Runnable {
     private Scanner scanner;
     private AtomicBoolean isConnected;
 
+    /**
+     * Constructs a new ClientWriter with the specified client socket and connection
+     * status.
+     * <p>
+     * This constructor initializes the client socket, sets up a PrintWriter to
+     * write output
+     * to the socket's output stream, and a Scanner to read input from the system's
+     * input stream.
+     * If an IOException occurs while setting up the PrintWriter, the exception's
+     * stack trace is printed.
+     * It also sets the connection status of this ClientWriter.
+     *
+     * @param clientSocket the client socket for this ClientWriter
+     * @param isConnected  the connection status for this ClientWriter
+     */
     public ClientWriter(Socket clientSocket, AtomicBoolean isConnected) {
         this.clientSocket = clientSocket;
         try {
@@ -26,6 +41,9 @@ public class ClientWriter implements Runnable {
     public void run() {
 
         String message;
+
+        // Continuously read input from the console and write it to the client socket
+        // until the client writes "exit"
         while (scanner.hasNextLine() && !(message = scanner.nextLine()).equals("exit")) {
             out.println(message);
         }
