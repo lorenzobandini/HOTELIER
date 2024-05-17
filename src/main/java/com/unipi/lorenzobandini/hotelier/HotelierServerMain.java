@@ -23,14 +23,14 @@ import com.unipi.lorenzobandini.hotelier.model.ServerGroupProperties;
 import java.util.concurrent.ExecutorService;
 
 public class HotelierServerMain {
-
+    // TODO: vedere se posso accorpare dei metodi usando delle funzioni. Rivedere algoritmo di punteggio. Fare commenti e documentazione su codice. Creare file .jar. Unire le repository e vedere come eseguirle insieme.
     public static void main(String[] args) {
         ServerGroupProperties properties = getPropertiesServer();
 
         int minPoolSize = Integer.parseInt(properties.getMinPoolSize());
         int maxPoolSize = Integer.parseInt(properties.getMaxPoolSize());
         int keepAliveTime = Integer.parseInt(properties.getKeepAliveTime());
-        // int timerUpdates = properties.getTimerUpdates();
+        int timerUpdates = Integer.parseInt(properties.getTimerUpdates());
         try {
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getPortNumber()), 0,
                     InetAddress.getByName(properties.getAddress()));
@@ -56,7 +56,7 @@ public class HotelierServerMain {
                                     .parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
                     .create();
 
-            new Thread(new HotelierUpdaterChart(Integer.parseInt(properties.getTimerUpdates()), gson, multicastSocket,
+            new Thread(new HotelierUpdaterChart(timerUpdates, gson, multicastSocket,
                     Integer.parseInt(properties.getMulticastPort()), properties.getMulticastAddress(), lockHotels,
                     lockReviews))
                     .start();
