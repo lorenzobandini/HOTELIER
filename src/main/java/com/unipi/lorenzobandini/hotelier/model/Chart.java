@@ -1,7 +1,6 @@
 package com.unipi.lorenzobandini.hotelier.model;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Chart {
@@ -21,8 +20,7 @@ public class Chart {
     }
 
     public void addHotel(String name, float score) {
-        hotels.add(new HotelInChart(name, score));
-        hotels.sort(Comparator.comparing(HotelInChart::getScore).reversed());
+        hotels.add(new HotelInChart(name, score));    
     }
 
     public void updateHotel(String name, float score) {
