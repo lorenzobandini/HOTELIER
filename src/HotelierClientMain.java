@@ -15,11 +15,6 @@ public class HotelierClientMain {
     public static void main(String[] args) throws InterruptedException {
         GroupProperties properties = getPropertiesClient();
 
-        System.out.println("Address: " + properties.getAddress());
-        System.out.println("Port Number: " + properties.getPortNumber());
-        System.out.println("Multicast Address: " + properties.getMulticastAddress());
-        System.out.println("Multicast Port: " + properties.getMulticastPort());
-
         AtomicBoolean isConnected = new AtomicBoolean(true);
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
@@ -32,8 +27,6 @@ public class HotelierClientMain {
                 InetAddress group = InetAddress.getByName(properties.getMulticastAddress());
                 SocketAddress socketAddress = new InetSocketAddress(group, multicastSocket.getLocalPort());
                 multicastSocket.joinGroup(socketAddress, null);
-                System.out.println("Connection established with " + clientSocket.getRemoteSocketAddress());
-                System.out.println("Multicast connection established with " + socketAddress);
 
                 Thread clientListenerThread = new Thread(new ClientListener(clientSocket));
                 Thread clientWriterThread = new Thread(new ClientWriter(clientSocket, isConnected));
