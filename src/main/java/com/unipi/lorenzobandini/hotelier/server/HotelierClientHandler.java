@@ -1,4 +1,4 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.server;
 
 import java.io.BufferedReader;
 import java.io.File;

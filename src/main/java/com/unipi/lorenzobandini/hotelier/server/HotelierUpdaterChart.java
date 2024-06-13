@@ -1,4 +1,4 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.server;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

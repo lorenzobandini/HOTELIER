@@ -38,16 +38,78 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>run-server</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <mainClass>com.unipi.lorenzobandini.hotelier.server.HotelierServerMain</mainClass>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>package-server</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
+                </manifest>
+              </archive>
+              <finalName>HotelierServer</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>run-client</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <mainClass>com.unipi.lorenzobandini.hotelier.client.HotelierClientMain</mainClass>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>package-client</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.unipi.lorenzobandini.hotelier.HotelierClientMain</mainClass>
+                </manifest>
+              </archive>
+              <finalName>HotelierClient</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <properties>
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>

@@ -1,33 +1,39 @@
-# Ignora i file di sistema
+# File compilati
+/bin/
+/target/*
+!/target/HotelierClient.jar
+!/target/HotelierServer.jar
+/build/
+
+# File di configurazione dell'IDE
+/.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# File temporanei
+*.log
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Altri file
 .DS_Store
 Thumbs.db
 
-# Ignora i file temporanei, i file di backup ecc
-*~
-*.swp
-*.tmp
-*.temp
-*.bak
-*.sav
-*.log
-
-# Ignora i file di sviluppo
-/target/
-*.class
-*.jar
+# File di pacchetto
 *.war
 *.ear
-*.logs
+*.zip
+*.tar.gz
+*.rar
 
-# Ignora i file di configurazione dell'IDE
-.idea/
-*.iml
-.vscode/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# File di log
+*.log
 
-# Ignora i file specifici di Maven
-log/
-target/
+# File di configurazione locali
+*.properties

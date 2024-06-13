@@ -1,4 +1,4 @@
-package com.unipi.lorenzobandini.hotelier;
+package com.unipi.lorenzobandini.hotelier.server;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -158,7 +158,7 @@ public class HotelierServerMain {
      */
     private static Properties getProperties() {
         Properties properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream("server_properties.properties")) {
+        try (FileInputStream fileInputStream = new FileInputStream("properties.properties")) {
             properties.load(fileInputStream);
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,0 +1,902 @@
+[
+  {
+    "city": "Aosta",
+    "hotels": [
+      {
+        "name": "Hotel Aosta 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Aosta 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Torino",
+    "hotels": [
+      {
+        "name": "Hotel Torino 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Torino 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Genova",
+    "hotels": [
+      {
+        "name": "Hotel Genova 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Genova 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Milano",
+    "hotels": [
+      {
+        "name": "Hotel Milano 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Milano 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Trento",
+    "hotels": [
+      {
+        "name": "Hotel Trento 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Trento 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Venezia",
+    "hotels": [
+      {
+        "name": "Hotel Venezia 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Venezia 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Udine",
+    "hotels": [
+      {
+        "name": "Hotel Udine 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Udine 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Reggio-Emilia",
+    "hotels": [
+      {
+        "name": "Hotel Reggio-Emilia 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Emilia 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Firenze",
+    "hotels": [
+      {
+        "name": "Hotel Firenze 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Firenze 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Perugia",
+    "hotels": [
+      {
+        "name": "Hotel Perugia 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Perugia 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Ancona",
+    "hotels": [
+      {
+        "name": "Hotel Ancona 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Ancona 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Roma",
+    "hotels": [
+      {
+        "name": "Hotel Roma 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Roma 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "L\u0027Aquila",
+    "hotels": [
+      {
+        "name": "Hotel L\u0027Aquila 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel L\u0027Aquila 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Campobasso",
+    "hotels": [
+      {
+        "name": "Hotel Campobasso 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Campobasso 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Napoli",
+    "hotels": [
+      {
+        "name": "Hotel Napoli 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Napoli 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Bari",
+    "hotels": [
+      {
+        "name": "Hotel Bari 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Bari 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Potenza",
+    "hotels": [
+      {
+        "name": "Hotel Potenza 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Potenza 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Reggio-Calabria",
+    "hotels": [
+      {
+        "name": "Hotel Reggio-Calabria 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Reggio-Calabria 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Palermo",
+    "hotels": [
+      {
+        "name": "Hotel Palermo 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Palermo 10",
+        "score": 0.0
+      }
+    ]
+  },
+  {
+    "city": "Cagliari",
+    "hotels": [
+      {
+        "name": "Hotel Cagliari 1",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 2",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 3",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 4",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 5",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 6",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 7",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 8",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 9",
+        "score": 0.0
+      },
+      {
+        "name": "Hotel Cagliari 10",
+        "score": 0.0
+      }
+    ]
+  }
+]
