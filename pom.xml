@@ -41,7 +41,7 @@
                     <configuration>
                         <transformers>
                             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
+                                <mainClass>com.unipi.lorenzobandini.hotelier.server.HotelierServerMain</mainClass>
                             </transformer>
                         </transformers>
                     </configuration>
@@ -57,7 +57,7 @@
                     <manifest>
                         <addClasspath>true</addClasspath>
                         <classpathPrefix>lib/</classpathPrefix>
-                        <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
+                        <mainClass>com.unipi.lorenzobandini.hotelier.server.HotelierServerMain</mainClass>
                     </manifest>
                 </archive>
             </configuration>
@@ -92,7 +92,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.unipi.lorenzobandini.hotelier.HotelierServerMain</mainClass>
+                                    <mainClass>com.unipi.lorenzobandini.hotelier.server.HotelierServerMain</mainClass>
                                 </manifest>
                             </archive>
                             <finalName>HotelierServer</finalName>
@@ -127,7 +127,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.unipi.lorenzobandini.hotelier.HotelierClientMain</mainClass>
+                                    <mainClass>com.unipi.lorenzobandini.hotelier.client.HotelierClientMain</mainClass>
                                 </manifest>
                             </archive>
                             <finalName>HotelierClient</finalName>
