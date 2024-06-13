@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class ClientListener implements Runnable {
 
@@ -21,7 +22,7 @@ public class ClientListener implements Runnable {
     public ClientListener(Socket clientSocket) {
         this.clientSocket = clientSocket;
         try {
-            this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             e.printStackTrace();
         }
