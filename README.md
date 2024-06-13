@@ -62,27 +62,31 @@ Users are assigned experience levels based on the number of reviews they submit,
 
 - `ClientGroupProperties.java`
 
-## Thread Schema
-
-### Server-side Threads
-
-Details on server-side threads and synchronization primitives used for managing shared resources.
-
-### Client-side Threads
-
-Details on client-side threads handling user interactions and communication with the server.
-
 ## Instruction Manual
 
 ### Compilation and Execution
 
 #### Server
 
-Steps to compile and execute the server component.
+Steps to compile and execute the server component:
+
+`mvn -P run-server exec:java`
+
+Steps to create server jar file and execute:
+
+`mvn -P package-server package`
+`java -jar target/HotelierServer.jar`
 
 #### Client
 
-Steps to compile and execute the client component.
+Steps to compile and execute the client component:
+
+`mvn -P run-client exec:java`
+
+Steps to create client jar file and execute:
+
+`mvn -P package-client package`
+`java -jar target/HotelierClient.jar`
 
 ### External Dependencies
 
